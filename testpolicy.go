@@ -10,6 +10,8 @@ import (
 var lookupMX = net.LookupMX
 
 func matchHostToPattern(host, pattern string) bool {
+	// Remove trailing . from host.
+	host = strings.TrimSuffix(host, ".")
 	hostParts := strings.Split(host, ".")
 	patternParts := strings.Split(pattern, ".")
 	if len(patternParts) != len(hostParts) || len(patternParts) < 1 {
