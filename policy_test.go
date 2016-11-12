@@ -35,50 +35,52 @@ func TestParsePolicy(t *testing.T) {
 		`{
       "mode": "report",
       "version": "STSv1",
-      "mx": ["*.google.com"],
+      "mx": ["*.example.com"],
       "max_age": 10
     }`: {Policy{Policy_REPORT,
-			[]string{"*.google.com"},
+			[]string{"*.example.com"},
 			now.Add(time.Second * time.Duration(10)),
+			"",
 		}, nil},
 		// A different valid policy:
 		`{
       "version": "STSv1",
       "mode": "enforce",
       "max_age": 11,
-      "mx": ["*.google.com", "mx2.gmail.com"]
+      "mx": ["*.example.com", "mx2.example.net"]
     }`: {Policy{Policy_ENFORCE,
-			[]string{"*.google.com", "mx2.gmail.com"},
+			[]string{"*.example.com", "mx2.example.net"},
 			now.Add(time.Second * time.Duration(11)),
+			"",
 		}, nil},
 		// Wrong version.
 		`{
       "version": "STSv2",
       "mode": "enforce",
       "max_age": 11,
-      "mx": ["*.google.com", "mx2.gmail.com"]
+      "mx": ["*.example.com", "mx2.gmail.com"]
     }`: {Policy{}, fmt.Errorf(`version=STSv2 does not match allowed version "STSv1"`)},
 		// Wrong mode.
 		`{
       "version": "STSv1",
       "mode": "enforc",
       "max_age": 11,
-      "mx": ["*.google.com", "mx2.gmail.com"]
+      "mx": ["*.example.com", "mx2.gmail.com"]
     }`: {Policy{}, fmt.Errorf(`mode=enforc must be one of "report", "enforce"`)},
 		// Bad host pattern.
 		`{
       "version": "STSv1",
       "mode": "enforce",
       "max_age": 11,
-      "mx": ["as*.google.com"]
-    }`: {Policy{}, fmt.Errorf(`invalid "mx" pattern "as*.google.com"`)},
+      "mx": ["as*.example.com"]
+    }`: {Policy{}, fmt.Errorf(`invalid "mx" pattern "as*.example.com"`)},
 		// Bad host pattern.
 		`{
       "version": "STSv1",
       "mode": "enforce",
       "max_age": 11,
-      "mx": ["mx1.*google.com"]
-    }`: {Policy{}, fmt.Errorf(`invalid "mx" pattern "mx1.*google.com"`)},
+      "mx": ["mx1.*example.com"]
+    }`: {Policy{}, fmt.Errorf(`invalid "mx" pattern "mx1.*example.com"`)},
 	}
 
 	for raw, want := range ts {

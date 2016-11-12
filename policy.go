@@ -26,6 +26,7 @@ type (
 		Mode    Mode
 		Mxs     []string
 		Expires time.Time
+		Id      string
 	}
 
 	// Unparsed JSON struct.
