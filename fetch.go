@@ -18,6 +18,7 @@ var (
 			return fmt.Errorf("redirects not allowed")
 		},
 	}
+	// Mockable for testing.
 	lookupTXT = net.LookupTXT
 )
 

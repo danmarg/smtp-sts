@@ -7,14 +7,14 @@ import (
 	"time"
 )
 
-func areEqual(a, b Policy) bool {
+func policiesAreEqual(a, b Policy) bool {
 	if a.Expires != b.Expires ||
 		a.Mode != b.Mode ||
-		len(a.Mxs) != len(b.Mxs) {
+		len(a.MXs) != len(b.MXs) {
 		return false
 	}
-	for i, x := range a.Mxs {
-		if x != b.Mxs[i] {
+	for i, x := range a.MXs {
+		if x != b.MXs[i] {
 			return false
 		}
 	}
@@ -87,7 +87,7 @@ func TestParsePolicy(t *testing.T) {
 		p, e := ParsePolicy(strings.NewReader(raw))
 		if (e != nil && want.E == nil) || (e == nil && want.E != nil) ||
 			(e != nil && want.E != nil && e.Error() != want.E.Error()) ||
-			!areEqual(want.P, p) {
+			!policiesAreEqual(want.P, p) {
 			t.Errorf("ParsePolicy(%v): want (%v, %v), got (%v, %v)", raw, want.P, want.E, p, e)
 			continue
 		}

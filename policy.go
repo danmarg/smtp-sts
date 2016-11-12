@@ -24,7 +24,7 @@ type (
 	// Policy represents a parsed policy.
 	Policy struct {
 		Mode    Mode
-		Mxs     []string
+		MXs     []string
 		Expires time.Time
 		Id      string
 	}
@@ -33,13 +33,13 @@ type (
 	rawPolicy struct {
 		Mode    string   `json:"mode"`
 		Version string   `json:"version"`
-		Mxs     []string `json:"mx"`
+		MXs     []string `json:"mx"`
 		MaxAge  uint32   `json:"max_age"`
 	}
 )
 
 var (
-	// Fake clock for testing.
+	// Mockable for testing.
 	clock = time.Now
 
 	validHostname = regexp.MustCompile(`^([*]\.)?([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])(\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]))*$`)
@@ -73,12 +73,12 @@ func ParsePolicy(reader io.Reader) (Policy, error) {
 	}
 	p.Expires = clock().Add(time.Duration(raw.MaxAge) * time.Second)
 	// Check MXes.
-	for _, m := range raw.Mxs {
+	for _, m := range raw.MXs {
 		if !validHostname.MatchString(m) {
 			return Policy{}, fmt.Errorf("invalid \"mx\" pattern \"%v\"", m)
 		}
 	}
-	p.Mxs = raw.Mxs
+	p.MXs = raw.MXs
 
 	return p, nil
 }

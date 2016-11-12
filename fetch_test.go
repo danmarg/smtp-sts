@@ -6,9 +6,7 @@ import (
 )
 
 func TestParseTxt(t *testing.T) {
-	var (
-		returnRecords []string
-	)
+	var returnRecords []string
 	lookupTXT = func(h string) ([]string, error) {
 		if h != "_mta-sts.example.com" {
 			t.Errorf("LookupTXT: want _mta-sts.example.com, got %v", h)
