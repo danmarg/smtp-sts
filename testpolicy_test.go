@@ -41,30 +41,30 @@ func TestValidateMx(t *testing.T) {
 	}{
 		{
 			MX: []*net.MX{{
-				Host: "mx1.example.com"}, {Host: "mx2.example.com"}},
+				Host: "mx1.example.com."}, {Host: "mx2.example.com."}},
 			P:      Policy{MXs: []string{"*.example.com"}},
-			WantMX: []*net.MX{{Host: "mx1.example.com"}, {Host: "mx2.example.com"}},
+			WantMX: []*net.MX{{Host: "mx1.example.com."}, {Host: "mx2.example.com."}},
 			E:      nil,
 		},
 		{
 			MX: []*net.MX{{
-				Host: "mx1.example.com"}, {Host: "mx2.example.com"}},
+				Host: "mx1.example.com."}, {Host: "mx2.example.com."}},
 			P:      Policy{MXs: []string{"mx1.example.com"}},
-			WantMX: []*net.MX{{Host: "mx1.example.com"}},
-			E:      fmt.Errorf("mx2.example.com does not match allowed MXes"),
+			WantMX: []*net.MX{{Host: "mx1.example.com."}},
+			E:      fmt.Errorf("mx2.example.com. does not match allowed MXes"),
 		},
 		{
 			MX: []*net.MX{{
-				Host: "mx1.example.com"}, {Host: "mx2.example.net"}},
+				Host: "mx1.example.com."}, {Host: "mx2.example.net."}},
 			P:      Policy{MXs: []string{"*.example.com"}},
-			WantMX: []*net.MX{{Host: "mx1.example.com"}},
-			E:      fmt.Errorf("mx2.example.net does not match allowed MXes"),
+			WantMX: []*net.MX{{Host: "mx1.example.com."}},
+			E:      fmt.Errorf("mx2.example.net. does not match allowed MXes"),
 		},
 		{
 			MX: []*net.MX{{
-				Host: "mx1.example.com"}, {Host: "mx2.example.net"}},
+				Host: "mx1.example.com."}, {Host: "mx2.example.net."}},
 			P:      Policy{MXs: []string{"*.example.com", "*.example.net"}},
-			WantMX: []*net.MX{{Host: "mx1.example.com"}, {Host: "mx2.example.net"}},
+			WantMX: []*net.MX{{Host: "mx1.example.com."}, {Host: "mx2.example.net."}},
 			E:      nil,
 		},
 	}
