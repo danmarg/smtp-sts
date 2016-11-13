@@ -16,7 +16,8 @@ func main() {
 
 	app.Commands = []cli.Command{
 		{
-			Name: "getdns",
+			Name:  "getdns",
+			Usage: "fetch the domain's policy *version* and print it",
 			Action: func(c *cli.Context) error {
 				if c.Args().First() == "" {
 					return fmt.Errorf("must specify domain")
@@ -30,7 +31,8 @@ func main() {
 			},
 		},
 		{
-			Name: "getpolicy",
+			Name:  "getpolicy",
+			Usage: "fetch the domain's policy and print it",
 			Action: func(c *cli.Context) error {
 				if c.Args().First() == "" {
 					return fmt.Errorf("must specify domain")
@@ -44,7 +46,8 @@ func main() {
 			},
 		},
 		{
-			Name: "getmxs",
+			Name:  "getmxs",
+			Usage: "fetch the domain's policy and MXs, and filter the MXs against the policy, reporting any which are invalid",
 			Action: func(c *cli.Context) error {
 				if c.Args().First() == "" {
 					return fmt.Errorf("must specify domain")
@@ -70,7 +73,8 @@ func main() {
 			},
 		},
 		{
-			Name: "testsmtp",
+			Name:  "testsmtp",
+			Usage: "fetch the domain's policy and MXs, filter the MXs, and test STARTTLS",
 			Action: func(c *cli.Context) error {
 				if c.Args().First() == "" {
 					return fmt.Errorf("must specify domain")
