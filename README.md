@@ -1,5 +1,7 @@
 # SMTP-STS Validator
 
+[![GoDoc](https://godoc.org/github.com/danmarg/smtp-sts?status.svg)](https://godoc.org/github.com/danmarg/smtp-sts)
+
 This is a simple library and command line tool implementing a primitive
 [SMTP-STS](https://datatracker.ietf.org/doc/draft-ietf-uta-mta-sts/)
 validator.
