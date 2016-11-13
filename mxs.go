@@ -6,9 +6,6 @@ import (
 	"strings"
 )
 
-// Mockable for testing.
-var lookupMX = net.LookupMX
-
 func matchHostToPattern(host, pattern string) bool {
 	// Remove trailing . from host.
 	host = strings.TrimSuffix(host, ".")
@@ -25,13 +22,8 @@ func matchHostToPattern(host, pattern string) bool {
 	return true
 }
 
-// CheckMX tests if the MX records for "domain" are valid according to "policy." Returns valid MXes for the domain, and error if any are invalid according to the policy.
-func FetchValidMX(domain string, policy Policy) (valid []*net.MX, err error) {
-	mxs, err := lookupMX(domain)
-	if err != nil {
-		return []*net.MX{}, err
-	}
-
+// FilterMXs tests if the MX records for "domain" are valid according to "policy." Returns valid MXes for the domain, and error if any are invalid according to the policy.
+func FilterMXs(mxs []*net.MX, policy Policy) (valid []*net.MX, err error) {
 	errs := []string{}
 
 	for _, mx := range mxs {

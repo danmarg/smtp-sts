@@ -5,6 +5,7 @@ import (
 	"net"
 	"net/http"
 	"strings"
+	"time"
 )
 
 const (
@@ -14,6 +15,7 @@ const (
 
 var (
 	httpClient = http.Client{
+		Timeout: time.Second * 60,
 		CheckRedirect: func(_ *http.Request, _ []*http.Request) error {
 			return fmt.Errorf("redirects not allowed")
 		},
@@ -67,7 +69,6 @@ func PolicyVersionForDomain(domain string) (string, error) {
 
 // PolicyForDomain fetches the policy for a given domain.
 func PolicyForDomain(domain string) (Policy, error) {
-	// TODO: does this check server cert?
 	resp, err := httpClient.Get("https://" + httpsHost + "." + domain + "/.well-known/mta-sts.json")
 	if err != nil {
 		return Policy{}, err

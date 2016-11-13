@@ -26,13 +26,6 @@ func mxsAreEqual(a, b []*net.MX) bool {
 }
 
 func TestValidateMx(t *testing.T) {
-	var returnRecords []*net.MX
-	lookupMX = func(d string) ([]*net.MX, error) {
-		if d != "example.com" {
-			t.Errorf("LookupMX: want example.com, got %v", d)
-		}
-		return returnRecords, nil
-	}
 	ts := []struct {
 		MX     []*net.MX
 		P      Policy
@@ -69,8 +62,7 @@ func TestValidateMx(t *testing.T) {
 		},
 	}
 	for _, want := range ts {
-		returnRecords = want.MX
-		gotMX, e := FetchValidMX("example.com", want.P)
+		gotMX, e := FilterMXs(want.MX, want.P)
 		if (e != nil && want.E == nil) || (e == nil && want.E != nil) ||
 			(e != nil && want.E != nil && e.Error() != want.E.Error()) ||
 			!mxsAreEqual(want.WantMX, gotMX) {

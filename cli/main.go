@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net"
 	"os"
 
 	"github.com/urfave/cli"
@@ -43,7 +44,7 @@ func main() {
 			},
 		},
 		{
-			Name: "mxtestpolicy",
+			Name: "getmxs",
 			Action: func(c *cli.Context) error {
 				if c.Args().First() == "" {
 					return fmt.Errorf("must specify domain")
@@ -53,13 +54,51 @@ func main() {
 					return e
 				}
 				fmt.Printf("Policy: %v\n", p)
-				mxs, err := sts.FetchValidMX(c.Args().First(), p)
+				mxs, e := net.LookupMX(c.Args().First())
+				if e != nil {
+					return e
+				}
+				mxs, e = sts.FilterMXs(mxs, p)
 				fmt.Printf("Matching MXes: \n")
 				for _, m := range mxs {
 					fmt.Printf("\t%s\t%d\n", m.Host, m.Pref)
 				}
-				if err != nil {
-					fmt.Printf("Errors: %v\n", err)
+				if e != nil {
+					fmt.Printf("Errors: %v\n", e)
+				}
+				return nil
+			},
+		},
+		{
+			Name: "testsmtp",
+			Action: func(c *cli.Context) error {
+				if c.Args().First() == "" {
+					return fmt.Errorf("must specify domain")
+				}
+				p, e := sts.PolicyForDomain(c.Args().First())
+				if e != nil {
+					return e
+				}
+				fmt.Printf("Policy: %v\n", p)
+				mxs, e := net.LookupMX(c.Args().First())
+				if e != nil {
+					return e
+				}
+				mxs, e = sts.FilterMXs(mxs, p)
+				fmt.Printf("Matching MXes: \n")
+				for _, m := range mxs {
+					fmt.Printf("\t%s\t%d\n", m.Host, m.Pref)
+				}
+				if e != nil {
+					fmt.Printf("Errors: %v\n", e)
+				}
+				for _, mx := range mxs {
+					fmt.Printf("Testing MX %v...", mx.Host)
+					if e := sts.CheckMXViaSMTP(mx); e != nil {
+						fmt.Printf("ERROR: %v\n", e)
+					} else {
+						fmt.Printf("OK!\n")
+					}
 				}
 				return nil
 			},
