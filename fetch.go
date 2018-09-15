@@ -70,7 +70,7 @@ func PolicyVersionForDomain(domain string) (string, error) {
 
 // PolicyForDomain fetches the policy for a given domain.
 func PolicyForDomain(domain string) (Policy, error) {
-	resp, err := httpClient.Get("https://" + httpsHost + "." + domain + "/.well-known/mta-sts.json")
+	resp, err := httpClient.Get("https://" + httpsHost + "." + domain + "/.well-known/mta-sts.txt")
 	if err != nil {
 		return Policy{}, err
 	}
