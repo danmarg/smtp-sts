@@ -2,6 +2,7 @@ package sts
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"strings"
@@ -73,5 +74,9 @@ func PolicyForDomain(domain string) (Policy, error) {
 	if err != nil {
 		return Policy{}, err
 	}
-	return ParsePolicy(resp.Body)
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return Policy{}, err
+	}
+	return ParsePolicy(string(b))
 }

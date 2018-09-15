@@ -2,13 +2,13 @@ package sts
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 	"time"
 )
 
 func policiesAreEqual(a, b Policy) bool {
-	if a.Expires != b.Expires ||
+	// The time comparison here should really be done with a fake clock, but whatever
+	if a.Expires.Sub(b.Expires) > time.Second*2 ||
 		a.Mode != b.Mode ||
 		len(a.MXs) != len(b.MXs) {
 		return false
@@ -32,59 +32,65 @@ func TestParsePolicy(t *testing.T) {
 		E error
 	}{
 		// A valid policy:
-		`{
-      "mode": "report",
-      "version": "STSv1",
-      "mx": ["*.example.com"],
-      "max_age": 10
-    }`: {Policy{Policy_REPORT,
+		`
+mode: testing
+version: STSv1
+mx: *.example.com
+max_age: 10
+`: {Policy{Policy_TESTING,
 			[]string{"*.example.com"},
 			now.Add(time.Second * time.Duration(10)),
 			"",
 		}, nil},
 		// A different valid policy:
-		`{
-      "version": "STSv1",
-      "mode": "enforce",
-      "max_age": 11,
-      "mx": ["*.example.com", "mx2.example.net"]
-    }`: {Policy{Policy_ENFORCE,
+		`
+mode: enforce
+version: STSv1
+mx: *.example.com
+mx: mx2.example.net
+max_age: 10
+    `: {Policy{Policy_ENFORCE,
 			[]string{"*.example.com", "mx2.example.net"},
 			now.Add(time.Second * time.Duration(11)),
 			"",
 		}, nil},
 		// Wrong version.
-		`{
-      "version": "STSv2",
-      "mode": "enforce",
-      "max_age": 11,
-      "mx": ["*.example.com", "mx2.gmail.com"]
-    }`: {Policy{}, fmt.Errorf(`version=STSv2 does not match allowed version "STSv1"`)},
+		`
+mode: enforce
+version: STSv2
+mx: *.example.com
+mx: mx2.example.net
+max_age: 10
+`: {Policy{}, fmt.Errorf(`invalid version: STSv2`)},
 		// Wrong mode.
-		`{
-      "version": "STSv1",
-      "mode": "enforc",
-      "max_age": 11,
-      "mx": ["*.example.com", "mx2.gmail.com"]
-    }`: {Policy{}, fmt.Errorf(`mode=enforc must be one of "report", "enforce"`)},
+		`
+mode: joking
+version: STSv1
+mx: *.example.com
+mx: mx2.example.net
+max_age: 10
+
+`: {Policy{}, fmt.Errorf(`invalid mode: joking`)},
 		// Bad host pattern.
-		`{
-      "version": "STSv1",
-      "mode": "enforce",
-      "max_age": 11,
-      "mx": ["as*.example.com"]
-    }`: {Policy{}, fmt.Errorf(`invalid "mx" pattern "as*.example.com"`)},
+		`
+mode: enforce
+version: STSv1
+mx: as*.example.com
+mx: mx2.example.net
+max_age: 10
+`: {Policy{}, fmt.Errorf(`invalid mx: as*.example.com`)},
 		// Bad host pattern.
-		`{
-      "version": "STSv1",
-      "mode": "enforce",
-      "max_age": 11,
-      "mx": ["mx1.*example.com"]
-    }`: {Policy{}, fmt.Errorf(`invalid "mx" pattern "mx1.*example.com"`)},
+		`
+mode: enforce
+version: STSv1
+mx: mx.*.example.com
+mx: mx2.example.net
+max_age: 10
+    `: {Policy{}, fmt.Errorf(`invalid mx: mx.*.example.com`)},
 	}
 
 	for raw, want := range ts {
-		p, e := ParsePolicy(strings.NewReader(raw))
+		p, e := ParsePolicy(raw)
 		if (e != nil && want.E == nil) || (e == nil && want.E != nil) ||
 			(e != nil && want.E != nil && e.Error() != want.E.Error()) ||
 			!policiesAreEqual(want.P, p) {
